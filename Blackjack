@@ -1,0 +1,220 @@
+import random
+from itertools import combinations,permutations
+def shuffle_new_deck()->tuple:
+    '''
+    This definition creates a shuffled deck of cards to play with
+
+    inputs: none
+
+    outputs: list of tuples that each represent the value and suit of a card
+    '''
+    deck = []
+    suits = ["Spades","Clubs","Hearts","Diamonds"]
+    numbers = ['A',2,3,4,5,6,7,8,9,10,'J','Q','K']
+
+    while len(deck) < 52:
+        suit = random.choice(suits)
+        value = random.choice(numbers)
+        card = (value,suit)
+        if card not in deck:
+            deck.append(card)
+            #print(card)
+    return deck
+    
+def get_new_deck()->tuple:
+    '''
+    This definition creates an untoched deck of cards, meaning the numbers and suits are all in order
+    
+    inputs: none
+
+    outputs: list of tuples that each represent the value and suit of a card
+    '''
+    deck = []
+    suits = ["Spades","Clubs","Hearts","Diamonds"]
+    numbers = ['A',2,3,4,5,6,7,8,9,10,'J','Q','K']
+
+    for suit in suits:
+        for value in numbers:
+            card = (value,suit)
+            deck.append(card)
+    return deck
+
+def get_card(hand)->tuple:
+        card = deck[0]
+        hand.append(card)
+        deck.remove(card)
+        return hand
+
+def get_sum(hand)->int:
+    summy = 0
+    for card in hand:
+        if(card[0] == 'J' or card[0] == 'Q' or card[0] == 'K'):
+            summy += 10
+        elif(card[0] == 'A'):
+            summy +=1
+        else:
+            summy += card[0]
+    return summy
+
+def game_split(hand)->tuple:
+    hand_1 = []
+    hand_2 = []
+
+    hand_1.append(hand[0])
+    hand_2.append(hand[1])
+    get_card(hand_1)
+    get_card(hand_2)
+    print("------  Hand 1  ------")
+    hand_1 = blackjack_game(hand_1)
+    all_hands.append(hand_1)
+    print("------  Hand 2  ------")
+    hand_2 = blackjack_game(hand_2)
+    all_hands.append(hand_2)
+
+    '''
+    print("Hand 1: ")
+    game_finish(dealer_hand,hand_1)
+    print("Hand 2: ")
+    game_finish(dealer_hand,hand_2)
+    '''
+
+def blackjack_game(play_hand)->tuple:
+    sum_of_hand = get_sum(play_hand)
+    while sum_of_hand < 21:
+
+        print(f"\nDealer's first card:\n{dealer_hand[0]}\n")
+
+        for i in play_hand:
+            print(i)
+        print("What would you like to do?\n(H) Hit\n(S) Stand\n(D) Double\n(L) Surrender")
+        if(play_hand[0][0]==play_hand[1][0]):
+            print("(G) Split")
+        nextPlay = input()
+
+        if(len(nextPlay) > 0):
+            nextPlay = (nextPlay[0]).upper()
+            if(nextPlay == 'H'):
+                get_card(play_hand)
+            elif(nextPlay == 'S'):
+                break
+            elif(nextPlay == 'D'):
+                #possibly combine with surrender if research is right
+                break
+            elif(nextPlay == 'L'):
+                get_card(play_hand)
+                break
+            elif(play_hand[0][0]==play_hand[1][0] and nextPlay == 'G'):
+                play_hand = game_split(play_hand)
+                return(play_hand)
+        else:
+            print("Either try again or read a rule book")
+        sum_of_hand = get_sum(play_hand)
+    if(nextPlay != 'G'):
+        return(play_hand)
+
+def blackjack_game_for_bots(play_hand)->tuple:
+    sum_of_hand = get_sum(play_hand)
+    while sum_of_hand < 21:
+
+        nextPlay = input()
+
+        if(len(nextPlay) > 0):
+            nextPlay = (nextPlay[0]).upper()
+            if(nextPlay == 'H'):
+                get_card(play_hand)
+            elif(nextPlay == 'S'):
+                break
+            elif(nextPlay == 'D'):
+                #possibly combine with surrender if research is right
+                break
+            elif(nextPlay == 'L'):
+                get_card(play_hand)
+                break
+            elif(play_hand[0][0]==play_hand[1][0] and nextPlay == 'G'):
+                play_hand = game_split(play_hand)
+                return(play_hand)
+        sum_of_hand = get_sum(play_hand)
+    if(nextPlay != 'G'):
+        return(play_hand)
+    
+def game_start():
+    print("Welcome to Blackjack!")
+    can_play = False
+    while can_play != True:
+        print("How many people do you want at the table? (1-4)")
+        num_players = int(input())
+        if(num_players <= 4 and num_players >= 1):
+            can_play = True
+        else: print("That won't:' work silly, please enter a valid number")
+    can_play = False
+    while can_play != True:
+        print("How many of those players do you want to be bots?")
+        num_bots = int(input())
+        if(num_bots <= num_players and num_bots >= 0):
+            can_play = True
+            num_players -= num_bots
+        else: print("That won't:' work silly, please enter a valid number")
+    
+    print("The dealer shuffles the deck.")
+    for i in range(3):
+        get_card(dealer_hand)
+
+    player_name = list() 
+    for i in range(num_players):
+        print(f"======  Player {i+1}  ======")
+        player_hand = []
+        for j in range(2):
+            get_card(player_hand)
+        final_hand = []
+        final_hand = blackjack_game(player_hand)
+        if(final_hand != None):
+            all_hands.append(final_hand)
+            player_name.append(i+1)
+        count = 1
+        while(len(player_name) != len(all_hands)):
+            player_name.append(f"{i+1}.{count}")
+            count+=1
+    for i in range(num_bots):
+        fe
+    game_finish(dealer_hand,all_hands,player_name)
+
+def game_finish(dealer_hand,hands_of_all_players,player_name):
+    all_sums = []
+    for hand_of_player in range (len(hands_of_all_players)):
+        player_sum = get_sum(hands_of_all_players[hand_of_player])
+        for card in hands_of_all_players[hand_of_player]:
+            if('A'in card and player_sum <= 11):
+                player_sum+=10
+    
+        all_sums.append(player_sum)
+    while get_sum(dealer_hand) < 17:
+        get_card(dealer_hand)
+    print(f"The dealer got {get_sum(dealer_hand)}")
+
+
+    for name in range(len(player_name)):
+        print(f"\n++++++  Player {player_name[name]}  ++++++")
+
+        print(f"Your final score was {all_sums[name]}")
+
+        if(get_sum(dealer_hand) > 21):
+            print("The dealer busted (gross). You win!")
+        else:
+            if(all_sums[name] > 21):
+                print("You busted (gross).")
+            if(get_sum(dealer_hand)>all_sums[name]):
+                print("The dealer won!")
+            else:
+                print("You win!")
+            
+
+all_hands = []
+player_hand = []
+dealer_hand = []
+deck = shuffle_new_deck()
+
+if __name__ == "__main__":
+    #shuffle_new_deck()
+    #get_new_deck()
+    #blackjack_game()
+    game_start()
